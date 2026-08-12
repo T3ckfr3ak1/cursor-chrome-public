@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 1024 1024">
+  <defs>
+    <!-- Three distinct steel greys so the Chrome silhouette still reads -->
+    <linearGradient id="petalA" x1="180" y1="40" x2="780" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6A6E76"/>
+      <stop offset="40%" stop-color="#3A3D44"/>
+      <stop offset="100%" stop-color="#16181C"/>
+    </linearGradient>
+    <linearGradient id="petalB" x1="520" y1="360" x2="860" y2="920" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8A909A"/>
+      <stop offset="40%" stop-color="#4A4E56"/>
+      <stop offset="100%" stop-color="#1C1E22"/>
+    </linearGradient>
+    <linearGradient id="petalC" x1="80" y1="280" x2="520" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#50545C"/>
+      <stop offset="40%" stop-color="#2A2C32"/>
+      <stop offset="100%" stop-color="#0E1014"/>
+    </linearGradient>
+    <!-- Brushed steel center -->
+    <linearGradient id="steel" x1="320" y1="280" x2="720" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#D8DCE2"/>
+      <stop offset="22%" stop-color="#9AA0A8"/>
+      <stop offset="48%" stop-color="#5A6068"/>
+      <stop offset="72%" stop-color="#B8BEC6"/>
+      <stop offset="100%" stop-color="#3A3E46"/>
+    </linearGradient>
+    <radialGradient id="steelOrb" cx="38%" cy="32%" r="68%">
+      <stop offset="0%" stop-color="#E8ECF0"/>
+      <stop offset="35%" stop-color="#9AA2AC"/>
+      <stop offset="70%" stop-color="#3A4048"/>
+      <stop offset="100%" stop-color="#121418"/>
+    </radialGradient>
+    <radialGradient id="bezelG" cx="38%" cy="28%" r="78%">
+      <stop offset="0%" stop-color="#4A4E56"/>
+      <stop offset="50%" stop-color="#1A1C20"/>
+      <stop offset="100%" stop-color="#050608"/>
+    </radialGradient>
+    <clipPath id="round"><circle cx="512" cy="512" r="500"/></clipPath>
+  </defs>
+
+  <circle cx="512" cy="512" r="500" fill="url(#bezelG)"/>
+  <circle cx="512" cy="512" r="500" fill="none" stroke="#C0C6CE" stroke-width="4"/>
+  <circle cx="512" cy="512" r="488" fill="none" stroke="#2A2C30" stroke-width="2"/>
+
+  <g clip-path="url(#round)">
+    <path d="M 512 512 L 512 28 A 484 484 0 0 1 931.1 754 Z" fill="url(#petalA)"/>
+    <path d="M 512 512 L 931.1 754 A 484 484 0 0 1 92.9 754 Z" fill="url(#petalB)"/>
+    <path d="M 512 512 L 92.9 754 A 484 484 0 0 1 512 28 Z" fill="url(#petalC)"/>
+
+    <!-- hairline steel seams -->
+    <path d="M 512 512 L 512 28" stroke="rgba(220,225,230,0.28)" stroke-width="2"/>
+    <path d="M 512 512 L 931.1 754" stroke="rgba(220,225,230,0.28)" stroke-width="2"/>
+    <path d="M 512 512 L 92.9 754" stroke="rgba(220,225,230,0.28)" stroke-width="2"/>
+
+    <!-- dark ring -->
+    <circle cx="512" cy="512" r="248" fill="#0A0B0D"/>
+    <!-- steel rim -->
+    <circle cx="512" cy="512" r="228" fill="none" stroke="url(#steel)" stroke-width="16"/>
+    <!-- steel orb -->
+    <circle cx="512" cy="512" r="206" fill="url(#steelOrb)"/>
+    <!-- hard specular shine -->
+    <ellipse cx="448" cy="440" rx="58" ry="38" fill="rgba(255,255,255,0.42)"/>
+    <ellipse cx="560" cy="560" rx="70" ry="40" fill="rgba(0,0,0,0.28)"/>
+  </g>
+</svg>

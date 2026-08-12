@@ -1,0 +1,185 @@
+'use strict';
+
+/**
+ * Build a minimal PUBLIC tree for the open GitHub repo.
+ * Full private tree (Play scripts, internal dumps, skills mirrors) stays on
+ * Gitea + private GitHub only.
+ *
+ * Usage: node scripts/export-public.js
+ * Writes: .public-export/  (gitignored)
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.join(__dirname, '..');
+const OUT = path.join(ROOT, '.public-export');
+
+/** Paths relative to repo root that are safe + necessary for a public MIT release. */
+const INCLUDE = [
+  'LICENSE',
+  'LICENSE.chromium',
+  'LICENSE.electron.txt',
+  'NOTICE',
+  'CREDITS.md',
+  'THIRD_PARTY_NOTICES.md',
+  'SECURITY.md',
+  'README.md',
+  'AGENTS.md',
+  'INSTALL.md',
+  '.cursorrules',
+  'package.json',
+  'package-lock.json',
+  'src',
+  'ui',
+  'mcp',
+  'assets',
+  'docs',
+  'examples',
+  '.cursor/skills/cursor-chrome',
+  '.cursor/rules/install-cursor-chrome.mdc',
+  '.github/copilot-instructions.md',
+  'scripts/generate-logo.js',
+  'scripts/restart-chrome.js',
+  'scripts/sync-agent-docs.js',
+  'scripts/install-startup.js',
+  'scripts/agent-install.js',
+  'scripts/remote-bootstrap.ps1',
+  'scripts/install.bat',
+  'scripts/watchdog.js',
+  'scripts/test-park-layout.js',
+  'scripts/export-public.js',
+  'start.bat',
+  'start-minimized.bat',
+  'start-hidden.bat',
+  'restart.bat',
+];
+
+/** Never copy these even if nested under an included dir. */
+const EXCLUDE_NAMES = new Set([
+  'carbon-fiber.png',
+  'carbon-fiber.stock-discarded.bak.png',
+  'carbon-fiber.watermarked.bak.png',
+  '.DS_Store',
+  'Thumbs.db',
+]);
+
+const EXCLUDE_DIR_NAMES = new Set(['node_modules', '.git', 'builds', 'old']);
+
+function shouldSkip(name, relPosix) {
+  if (EXCLUDE_NAMES.has(name)) return true;
+  if (EXCLUDE_DIR_NAMES.has(name)) return true;
+  if (relPosix.includes('/play-')) return true; // private Play Console helpers
+  if (relPosix.endsWith('.bak.png')) return true;
+  return false;
+}
+
+function copyFile(src, dest) {
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.copyFileSync(src, dest);
+}
+
+function copyTree(srcRel) {
+  const src = path.join(ROOT, srcRel);
+  if (!fs.existsSync(src)) {
+    console.warn('skip missing', srcRel);
+    return;
+  }
+  const st = fs.statSync(src);
+  if (st.isFile()) {
+    copyFile(src, path.join(OUT, srcRel));
+    return;
+  }
+  const walk = (dir, relBase) => {
+    for (const name of fs.readdirSync(dir)) {
+      const rel = path.join(relBase, name).replace(/\\/g, '/');
+      if (shouldSkip(name, rel)) continue;
+      const full = path.join(dir, name);
+      const st2 = fs.statSync(full);
+      if (st2.isDirectory()) walk(full, rel);
+      else copyFile(full, path.join(OUT, rel));
+    }
+  };
+  walk(src, srcRel.replace(/\\/g, '/'));
+}
+
+function writePublicReadmeExtras() {
+  // Soften README for public audience: no internal path assumptions required.
+  const readmePath = path.join(OUT, 'README.md');
+  if (!fs.existsSync(readmePath)) return;
+  let text = fs.readFileSync(readmePath, 'utf8');
+  if (!text.includes('## Privacy & remotes')) {
+    text += `
+
+## Privacy & remotes
+
+This **public** repository is a minimal MIT distribution of Cursor-Chrome (app + agent API).
+
+- Loopback-only API (\`127.0.0.1:9222\`) and CDP (\`9223\`) — see [SECURITY.md](SECURITY.md).
+- Internal Play Console operator scripts and private notes are **not** shipped here.
+- License: [LICENSE](LICENSE) · Notices: [NOTICE](NOTICE) · Credits: [CREDITS.md](CREDITS.md) · Chromium: [LICENSE.chromium](LICENSE.chromium) · Electron: [LICENSE.electron.txt](LICENSE.electron.txt)
+`;
+  }
+  fs.writeFileSync(readmePath, text);
+}
+
+function stripPrivatePackageBits() {
+  const pkgPath = path.join(OUT, 'package.json');
+  if (!fs.existsSync(pkgPath)) return;
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+  pkg.name = 'cursor-chrome';
+  pkg.private = false;
+  pkg.repository = {
+    type: 'git',
+    url: 'https://github.com/T3ckfr3ak1/cursor-chrome-public.git',
+  };
+  // Keep scripts that exist in the public tree only
+  const keepScripts = [
+    'start',
+    'start:minimized',
+    'start:hidden',
+    'restart',
+    'restart:minimized',
+    'install:agent',
+    'install:agent:json',
+    'test:park',
+    'generate-logo',
+    'docs:sync',
+    'mcp',
+    'startup:install',
+    'startup:uninstall',
+    'prepack',
+    'pack',
+    'dist',
+    'postinstall',
+    'export:public',
+  ];
+  if (pkg.scripts) {
+    const next = {};
+    for (const k of keepScripts) {
+      if (pkg.scripts[k]) next[k] = pkg.scripts[k];
+    }
+    pkg.scripts = next;
+  }
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+}
+
+function main() {
+  fs.rmSync(OUT, { recursive: true, force: true });
+  fs.mkdirSync(OUT, { recursive: true });
+  for (const rel of INCLUDE) copyTree(rel);
+  writePublicReadmeExtras();
+  stripPrivatePackageBits();
+  // Marker so public clones know what this tree is
+  fs.writeFileSync(
+    path.join(OUT, 'PUBLIC_RELEASE.md'),
+    `# Public release tree
+
+Generated by \`node scripts/export-public.js\` from the private monorepo.
+Do not commit secrets, play operator dumps, or watermarked stock assets.
+`
+  );
+  console.log('Public export ready:', OUT);
+}
+
+main();

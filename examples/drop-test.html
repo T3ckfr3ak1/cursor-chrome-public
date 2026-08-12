@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Drop test</title>
+    <style>
+      body { font-family: sans-serif; background: #111; color: #eee; padding: 24px; }
+      #zone {
+        margin-top: 16px;
+        border: 2px dashed #888;
+        border-radius: 12px;
+        min-height: 180px;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+      #zone.over { border-color: #c0a840; background: #1a1810; }
+      #out { margin-top: 16px; white-space: pre-wrap; font-family: monospace; }
+    </style>
+  </head>
+  <body>
+    <h1>File drop test</h1>
+    <input id="file" type="file" multiple />
+    <div id="zone">Drop files here</div>
+    <div id="out">waiting…</div>
+    <script>
+      const zone = document.getElementById('zone');
+      const out = document.getElementById('out');
+      const file = document.getElementById('file');
+      function show(files) {
+        const names = [...files].map((f) => f.name + ' (' + f.size + ')').join('\\n');
+        out.textContent = names || '(empty)';
+        document.title = 'dropped:' + (files[0] && files[0].name || 'none');
+      }
+      file.addEventListener('change', () => show(file.files));
+      for (const type of ['dragenter', 'dragover']) {
+        zone.addEventListener(type, (e) => { e.preventDefault(); zone.classList.add('over'); });
+      }
+      zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('over');
+        show(e.dataTransfer.files);
+      });
+    </script>
+  </body>
+</html>

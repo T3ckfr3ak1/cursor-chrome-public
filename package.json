@@ -1,0 +1,89 @@
+{
+  "name": "cursor-chrome",
+  "version": "1.2.5",
+  "description": "Cursor-Chrome — Chromium browser shell for Cursor agents (up to 20 concurrent tabs, minimized-capable)",
+  "main": "src/main.js",
+  "author": "IronWood Apps",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "start:minimized": "electron . --minimized",
+    "start:hidden": "electron . --hidden",
+    "restart": "node scripts/restart-chrome.js",
+    "restart:minimized": "node scripts/restart-chrome.js --minimized",
+    "install:agent": "node scripts/agent-install.js",
+    "install:agent:json": "node scripts/agent-install.js --json",
+    "test:park": "node scripts/test-park-layout.js",
+    "generate-logo": "node scripts/generate-logo.js",
+    "docs:sync": "node scripts/sync-agent-docs.js",
+    "mcp": "node mcp/server.js",
+    "startup:install": "node scripts/install-startup.js install",
+    "startup:uninstall": "node scripts/install-startup.js uninstall",
+    "prepack": "node scripts/sync-agent-docs.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win nsis",
+    "postinstall": "electron-builder install-app-deps && node scripts/install-git-hooks.js",
+    "export:public": "node scripts/export-public.js"
+  },
+  "build": {
+    "appId": "com.cursor.chrome",
+    "productName": "Cursor-Chrome",
+    "copyright": "Copyright © 2026 IronWood Apps",
+    "directories": {
+      "output": "builds",
+      "buildResources": "assets"
+    },
+    "files": [
+      "src/**/*",
+      "ui/**/*",
+      "assets/**/*",
+      "LICENSE",
+      "LICENSE.chromium",
+      "LICENSE.electron.txt",
+      "NOTICE",
+      "CREDITS.md",
+      "THIRD_PARTY_NOTICES.md",
+      "SECURITY.md",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "artifactName": "Cursor-Chrome_${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Cursor-Chrome"
+    }
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "uuid": "^11.0.5",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "electron": "^34.0.0",
+    "electron-builder": "^25.1.8",
+    "pngjs": "^7.0.0",
+    "sharp": "^0.35.3",
+    "to-ico": "^1.1.5"
+  },
+  "allowScripts": {
+    "electron@34.5.8": true
+  },
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/T3ckfr3ak1/cursor-chrome-public.git"
+  }
+}
