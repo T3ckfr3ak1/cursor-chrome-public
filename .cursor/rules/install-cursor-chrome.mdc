@@ -1,0 +1,40 @@
+---
+description: When the user says install this / set up Cursor-Chrome / pastes the public GitHub link — install fully until /health is ok
+globs:
+alwaysApply: true
+---
+
+# Cursor-Chrome — INSTALL THIS (binding)
+
+## If you see these user intents, ACT (do not only document)
+
+- "install this" / "hey install this" / "install it"
+- "set this up" / "get this running" / "setup Cursor-Chrome"
+- Pasted https://github.com/T3ckfr3ak1/cursor-chrome-public and wants the app
+
+## Exact procedure
+
+1. Open **INSTALL.md** if you need detail; otherwise execute below.
+2. **If workspace has `package.json` with name cursor-chrome** (this clone):
+
+```bat
+npm run install:agent
+```
+
+3. **If workspace is NOT the clone** and user only has the URL — Windows:
+
+```powershell
+irm https://raw.githubusercontent.com/T3ckfr3ak1/cursor-chrome-public/main/scripts/remote-bootstrap.ps1 | iex
+```
+
+Else: `git clone` → `cd` → `npm run install:agent`.
+
+4. **Must verify:** `GET http://127.0.0.1:9222/health` returns `"ok": true`.
+5. Reply with: health ok, version, absolute `src/client.js` path, API URL.
+6. For browser automation after, follow `docs/THREAD-PROTOCOL.md`.
+
+## Forbidden
+
+- Ending with "you can run npm install" without running it
+- Asking "proceed with install?" after the user already said install this
+- Stopping after clone without `install:agent` + health

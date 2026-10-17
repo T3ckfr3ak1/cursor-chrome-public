@@ -1,0 +1,25 @@
+Cursor-Chrome
+=============
+
+Copyright (c) 2026 IronWood Apps and contributors.
+
+This product is licensed under the MIT License (see LICENSE).
+
+Cursor-Chrome is an Electron shell that embeds Chromium for local agent control.
+It is not affiliated with, endorsed by, or sponsored by Google LLC, Google
+Chrome, the Chromium Authors, or Electron / OpenJS Foundation.
+
+Chromium is included via Electron under Chromium’s BSD-style license. The
+required copyright notice, conditions, and disclaimer are in LICENSE.chromium.
+The full Chromium third-party credits bundle (`LICENSES.chromium.html`) ships
+with Electron binaries and must be retained in binary distributions.
+Electron’s MIT license text is in LICENSE.electron.txt.
+
+The agent HTTP API and Chromium remote-debugging port bind to 127.0.0.1 only.
+They intentionally have no authentication. Treat them as same-machine power tools:
+any local process can drive tabs, read pages, export session cookies, and attach
+files from absolute paths the OS user can read. Do not expose ports 9222/9223
+to the network.
+
+Third-party components and their licenses are listed in THIRD_PARTY_NOTICES.md
+and CREDITS.md.

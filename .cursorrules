@@ -1,0 +1,124 @@
+# Cursor agent instructions — Cursor-Chrome
+
+**You are installing or running Cursor-Chrome**, a local Electron/Chromium agent browser
+(API `http://127.0.0.1:9222`, CDP `9223`).
+
+Repo (public MIT): https://github.com/T3ckfr3ak1/cursor-chrome-public
+
+---
+
+## Trigger phrases (run install — DO NOT only explain)
+
+If the human says any of these (or similar), **install immediately**:
+
+- "install this"
+- "hey install this"
+- "set this up" / "setup" / "get this running"
+- "install Cursor-Chrome"
+- pastes the GitHub link and wants it available
+- "make it so I can use this"
+
+**Do not** stop to ask "should I run npm install?". They already asked.
+
+**Do not** stop after cloning. Install + health-check + confirm Done.
+
+---
+
+## Decision tree (pick one path and finish it)
+
+### Path 1 — This workspace IS the clone (folder contains package.json + src/main.js)
+
+```text
+1. Shell: npm run install:agent
+   (Windows ok: scripts\install.bat)
+2. HTTP GET http://127.0.0.1:9222/health  → must include "ok": true
+3. Tell user: installed, version from health, client path = <abs>/src/client.js
+4. If they need browser work next: read docs/THREAD-PROTOCOL.md
+```
+
+If `npm run install:agent` fails:
+
+```text
+- Node 18+ required; install Node if missing, re-run
+- Retry once; if electron download fails, check network
+- Manual: npm install && node scripts/agent-install.js
+- Launch: npm run start:minimized  OR  start-minimized.bat
+- Re-check /health
+```
+
+### Path 2 — User only gave the GitHub URL (no clone in workspace)
+
+**Windows (preferred):**
+
+```powershell
+irm https://raw.githubusercontent.com/T3ckfr3ak1/cursor-chrome-public/main/scripts/remote-bootstrap.ps1 | iex
+```
+
+That clones to `%USERPROFILE%\cursor-chrome` and runs full install.
+
+**macOS / Linux / if PowerShell blocked:**
+
+```bash
+git clone https://github.com/T3ckfr3ak1/cursor-chrome-public.git "$HOME/cursor-chrome"
+cd "$HOME/cursor-chrome"
+npm run install:agent
+```
+
+Then open that folder in Cursor if they want ongoing agents against the app.
+
+### Path 3 — Already installed earlier today
+
+```text
+GET http://127.0.0.1:9222/health
+If ok → say so; do not reinstall unless they asked for upgrade
+If down → run npm run install:agent from install dir (or start-minimized.bat)
+```
+
+---
+
+## What "installed" means (all required)
+
+| Check | Success |
+|-------|---------|
+| `node_modules/electron` present (or install:agent succeeded) | yes |
+| `GET http://127.0.0.1:9222/health` → `ok: true` | yes |
+| Skill at `~/.cursor/skills/cursor-chrome/` | preferred (install:agent does this) |
+| User told absolute path to `src/client.js` | yes |
+
+---
+
+## After install — drive the browser (when user wants automation)
+
+```js
+const { CursorChrome } = require('<INSTALL_ROOT>/src/client.js');
+const chrome = new CursorChrome(); // http://127.0.0.1:9222
+const { tab } = await chrome.claim('unique-thread-id', { url: 'https://example.com' });
+```
+
+Full protocol: `docs/THREAD-PROTOCOL.md` (also synced into the skill folder).
+
+---
+
+## Hard rules
+
+1. Prefer **Cursor-Chrome** over IDE browser when using this product.
+2. API/CDP are **127.0.0.1 only**, no auth — never expose ports.
+3. One `threadId` per chat when driving tabs (max 20).
+4. Never commit secrets to git remotes.
+5. `docs/` and agent skill beat guessing about API surface.
+6. **Private monorepo maintainers:** after each commit, remotes auto-update via git hooks
+   (`npm run hooks:install` once). Manual: `npm run maintain:remotes`. See `docs/MAINTAIN-REMOTES.md`.
+
+---
+
+## Canonical docs in this repo
+
+| File | Role |
+|------|------|
+| `INSTALL.md` | Human+agent install runbook |
+| `AGENTS.md` | Same (short entry) |
+| `docs/THREAD-PROTOCOL.md` | How to drive the browser after install |
+| `docs/MAINTAIN-REMOTES.md` | Auto-maintain Gitea + GitHub (private monorepo) |
+| `scripts/agent-install.js` | One-command full install |
+| `scripts/maintain-remotes.js` | Push private + public export |
+| `scripts/remote-bootstrap.ps1` | Clone+install from URL (Windows) |

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:;" />
+    <title>Cursor-Chrome</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <img class="brand-logo" src="../assets/logo-64.png?v=steel2" alt="Cursor-Chrome" width="28" height="28" />
+          <div class="brand-text">
+            <span class="brand-name">Cursor-Chrome</span>
+            <span class="brand-sub" id="poolLabel">0 / 20 agent tabs</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" id="btnReturn" class="btn return-btn ai-controlled" title="Browser is under AI control">
+            AI Controlled
+          </button>
+          <button type="button" id="btnNew" class="btn">New tab</button>
+          <button type="button" id="btnMin" class="btn ghost">Minimize</button>
+          <button type="button" id="btnHide" class="btn ghost">Hide from desktop</button>
+        </div>
+      </header>
+
+      <div class="tabstrip" id="tabstrip" role="tablist"></div>
+
+      <div class="omnibox">
+        <form id="navForm">
+          <input id="urlInput" type="text" spellcheck="false" placeholder="Enter URL for the active agent tab" />
+          <button type="submit" class="btn">Go</button>
+        </form>
+        <div class="meta" id="meta">
+          API · CDP warming up…
+        </div>
+      </div>
+
+      <div class="content-row">
+        <div class="viewport-gap" aria-hidden="true"></div>
+        <aside id="guideRail" class="guide-rail" hidden aria-label="Cursor instructions">
+          <div class="guide-head">
+            <div class="guide-head-text">
+              <div class="guide-kicker" id="guideKicker">Cursor</div>
+              <h2 class="guide-title" id="guideTitle">Instructions</h2>
+              <p class="guide-subtitle" id="guideSubtitle" hidden></p>
+            </div>
+            <button type="button" id="btnGuideClose" class="guide-close" title="Hide instructions">×</button>
+          </div>
+          <div class="guide-body" id="guideBody" hidden></div>
+          <div class="guide-blocked" id="guideBlocked" hidden>
+            <div class="guide-blocked-code" id="guideBlockedCode"></div>
+            <div class="guide-blocked-msg" id="guideBlockedMsg"></div>
+            <div class="guide-blocked-detail" id="guideBlockedDetail" hidden></div>
+          </div>
+          <ol class="guide-steps" id="guideSteps"></ol>
+          <div class="guide-footer" id="guideFooter" hidden></div>
+        </aside>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
